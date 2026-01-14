@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    // https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping
+    "target": "es2023",
+    "lib": ["es2024"],
+    "module": "nodenext",
+    "noEmit": true,
+    "strict": true,
+    "allowUnreachableCode": false,
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "index.ts"
+  ]
+}
