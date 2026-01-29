@@ -5,7 +5,11 @@
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
-    "start": "node --env-file-if-exists=.env src/index.ts"
+    "start": "node --env-file-if-exists=.env src/index.ts",
+    "test": "run-p -cl test:*",
+    "test:ts": "tsc --pretty --noEmit",
+    "test:eslint": "eslint --color --max-warnings=0 'src/**/*'",
+    "test:prettier": "prettier 'src/**/*' -l"
   },
   "dependencies": {
     "@sentry/node": "^10.34.0",

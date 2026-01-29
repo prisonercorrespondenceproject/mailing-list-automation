@@ -13,6 +13,7 @@ async function main() {
   const sheets = await getSpreadsheets();
 
   const logToSpreadsheet = async (message: string) => {
+    console.log(`${today}: ${message}`);
     await sheets.log.addRow([today, message]);
   };
 
@@ -28,6 +29,7 @@ async function main() {
   });
 
   await updateAggregatedList({
+    aggregatedSheet: sheets.aggregatedMasterList,
     zohoAdditionsSheet: sheets.zohoAdditions,
     riseupPreviousSheet: sheets.riseupPrevious,
     riseupUnsubSheet: sheets.riseupUnsubscribed,
@@ -60,8 +62,6 @@ async function checkAndUpdateNewMembersFromZoho({
   const newEmails = [
     ...new Set(zohoEmails).difference(new Set(alreadyAddedEmails)),
   ];
-
-  console.log("new emails", newEmails.length, newEmails);
 
   if (newEmails.length > 0) {
     await zohoAdditionsSheet.addRows(newEmails.map((email) => [email, today]));
@@ -107,15 +107,41 @@ async function compareAndUpdateRiseup({
 }
 
 async function updateAggregatedList({
+  aggregatedSheet,
   zohoAdditionsSheet,
   riseupPreviousSheet,
   riseupUnsubSheet,
   logToSpreadsheet,
 }: {
+  aggregatedSheet: GoogleSpreadsheetWorksheet;
   zohoAdditionsSheet: GoogleSpreadsheetWorksheet;
   riseupPreviousSheet: GoogleSpreadsheetWorksheet;
   riseupUnsubSheet: GoogleSpreadsheetWorksheet;
   logToSpreadsheet: (message: string) => Promise<void>;
 }) {
-  // TODO
+  const currentAggregatedList = new Set(
+    await getColumn(aggregatedSheet, "Email"),
+  );
+
+  const allEmails = new Set([
+    ...(await getColumn(zohoAdditionsSheet, "Email")),
+    ...(await getColumn(riseupPreviousSheet, "Email")),
+  ]);
+
+  const newAggregatedList = allEmails.difference(
+    new Set(await getColumn(riseupUnsubSheet, "Email")),
+  );
+
+  // if the list is different...
+  if (currentAggregatedList.symmetricDifference(newAggregatedList).size > 0) {
+    await aggregatedSheet.clear("A2:A");
+    await aggregatedSheet.addRows([...newAggregatedList].map((e) => [e]));
+    await aggregatedSheet.loadCells("B1");
+    aggregatedSheet.getCellByA1("B1").value = `Last updated: ${today}`;
+    await logToSpreadsheet(
+      `Updated aggregated list (size is now ${newAggregatedList.size})`,
+    );
+  }
+
+  await aggregatedSheet.saveUpdatedCells();
 }
