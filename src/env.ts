@@ -8,7 +8,8 @@ const isDevEnv = process.env["NODE_ENV"] !== "production";
 export const {
   GOOGLE_SERVICE_ACCOUNT_EMAIL,
   GOOGLE_PRIVATE_KEY,
-  SPREADSHEET_ID,
+  SPREADSHEET_DOC_ID,
+  SPREADSHEET_SHEET_IDS,
 
   RISEUP_USERNAME,
   RISEUP_PASSWORD,
@@ -17,18 +18,30 @@ export const {
   ZOHO_CLIENT_ID,
   ZOHO_CLIENT_SECRET,
   ZOHO_REFRESH_TOKEN,
+  ZOHO_ACCOUNT_NAME,
 
   SENTRY_DSN,
 } = parseEnv(process.env, {
   GOOGLE_SERVICE_ACCOUNT_EMAIL: z.string().min(1),
   GOOGLE_PRIVATE_KEY: z.string().min(1),
-  SPREADSHEET_ID: z.string().min(1),
+  SPREADSHEET_DOC_ID: z.string().min(1),
+  SPREADSHEET_SHEET_IDS: z.object({
+    log: z.number().min(0),
+    aggregatedMasterList: z.number().min(0),
+    zohoAdditions: z.number().min(0),
+    riseupUnsubscribed: z.number().min(0),
+    riseupPrevious: z.number().min(0),
+  }),
+
   RISEUP_USERNAME: z.string().min(1),
   RISEUP_PASSWORD: z.string().min(1),
   RISEUP_LIST_NAME: z.string().min(1),
+
   ZOHO_CLIENT_ID: z.string().min(1),
   ZOHO_CLIENT_SECRET: z.string().min(1),
   ZOHO_REFRESH_TOKEN: z.string().min(1),
+  ZOHO_ACCOUNT_NAME: z.string().min(1),
+
   SENTRY_DSN: z.string().min(1).optional(),
 });
 

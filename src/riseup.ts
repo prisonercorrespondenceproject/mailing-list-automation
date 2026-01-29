@@ -2,6 +2,19 @@ import ky from "ky";
 
 import { RISEUP_LIST_NAME, RISEUP_PASSWORD, RISEUP_USERNAME } from "./env.ts";
 
+/*
+ * Riseup is truly cursed... it's based off this old Perl mailing list software
+ * Sympa, but as far as I can tell it's disabled the following useful things
+ * that Sympa includes:
+ *
+ * - a "blacklist" of unsubscribed users
+ * - any kind of API (HTTP, or even Sympa's venerable SOAP API)
+ *
+ * For that reason, this module works by impersonating a browser and submitting
+ * forms, checking for errors in the response HTML. It mostly works, but it's
+ * not the most robust long-term solution.
+ */
+
 export async function getRiseupListUsers(): Promise<string[]> {
   const cookie = await getSessionCookie();
 

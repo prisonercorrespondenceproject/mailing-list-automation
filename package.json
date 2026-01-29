@@ -10,6 +10,7 @@
   "dependencies": {
     "@sentry/node": "^10.34.0",
     "cheerio": "^1.1.2",
+    "date-fns": "^4.1.0",
     "google-auth-library": "^10.5.0",
     "google-spreadsheet": "^5.0.2",
     "ky": "^1.14.2",
