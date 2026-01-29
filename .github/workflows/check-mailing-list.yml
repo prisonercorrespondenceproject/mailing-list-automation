@@ -1,0 +1,51 @@
+name: update mailing list spreadsheet
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "13 4 * * *"
+
+jobs:
+  scheduled:
+    runs-on: ubuntu-24.04
+    environment: twoot
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          # disjoint branch for keeping action alive
+          ref: "persist"
+          path: "persist"
+      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # 4.2.0
+        with:
+          run_install: false
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # 6.2.0
+        with:
+          node-version-file: ".node-version"
+          cache: "pnpm"
+      - run: pnpm install --production --frozen-lockfile
+      - run: pnpm start
+        env:
+          NODE_ENV: "production"
+          GOOGLE_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
+          GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
+          SPREADSHEET_DOC_ID: ${{ secrets.SPREADSHEET_DOC_ID }}
+          SPREADSHEET_SHEET_IDS: ${{ secrets.SPREADSHEET_SHEET_IDS }}
+          RISEUP_USERNAME: ${{ secrets.RISEUP_USERNAME }}
+          RISEUP_PASSWORD: ${{ secrets.RISEUP_PASSWORD }}
+          RISEUP_LIST_NAME: ${{ secrets.RISEUP_LIST_NAME }}
+          ZOHO_CLIENT_ID: ${{ secrets.ZOHO_CLIENT_ID }}
+          ZOHO_CLIENT_SECRET: ${{ secrets.ZOHO_CLIENT_SECRET }}
+          ZOHO_REFRESH_TOKEN: ${{ secrets.ZOHO_REFRESH_TOKEN }}
+          ZOHO_ACCOUNT_NAME: ${{ secrets.ZOHO_ACCOUNT_NAME }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      - name: Commit and push
+        run: |-
+          cd persist
+          date > latest.txt
+          git config user.name "Automated"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          timestamp=$(date -u)
+          git commit -m "Latest data: ${timestamp}" || exit 0
+          git push
