@@ -66,13 +66,14 @@ async function getEmailsFromAPI(token: string, prevCursor: string | undefined) {
   if (prevCursor) headers.record_cursor = prevCursor;
 
   const res = await ky(
-    `${API_HOST}/creator/v2.1/data/${ZOHO_ACCOUNT_NAME}/report/outside_member_mailing_list`,
+    `${API_HOST}/creator/v2.1/data/${ZOHO_ACCOUNT_NAME}/report/Members_Form_View`,
     {
       method: "GET",
       searchParams: {
         field_config: "custom",
         fields: "Email",
-        criteria: 'Email != ""',
+        criteria:
+          'Email != "" && Priority == "Successfully Matched" || Priority == "Requires Confirmation"',
         max_records: "1000",
       },
       headers,
